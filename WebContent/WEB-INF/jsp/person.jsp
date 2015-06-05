@@ -79,6 +79,7 @@
 		
 		$scope.editPerson = function(id) {
 			$scope.edit = true;
+			//TODO find person properly
 			$scope.fName = $scope.persons[id - 1].name;
 			$scope.fDate = $scope.persons[id - 1].birthDate;
 		};
@@ -90,8 +91,8 @@
 		};
 		
 		$scope.submitForm = function() {
-			
-			$http.post("http://localhost:8080/train_jee/rest/person/add", {name: "Jack", birthDate: 321});
+			getPersonFromForm($scope);
+			$http.post("http://localhost:8080/train_jee/rest/person/add", getPersonFromForm($scope));
 		};
 	});
 	
@@ -107,9 +108,11 @@
 		return person;
 	}
 	
-	function getPersonFromForm() {
+	function getPersonFromForm($scope) {
 		var person = {};
 		person.name = $scope.fName;
+		person.birthDate = new Date($scope.fDate).getTime();
+		return person;
 	}
 	
 	function getDateToString(date) {
