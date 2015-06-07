@@ -5,14 +5,15 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import danny.demo.train.dto.PersonDto;
+import danny.demo.train.service.PersonService;
 
 @Path("/person")
 @Consumes(MediaType.TEXT_PLAIN)
@@ -36,16 +37,34 @@ public class PersonController {
 	
 	@POST
 	@Path("/add")
-	@Produces(MediaType.TEXT_PLAIN)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String addPerson(PersonDto p) {
+	@Produces(MediaType.TEXT_PLAIN)
+	public String addPerson(PersonDto personDto) {
+		try {
+			personService.addPerson(personDto);
+		} catch (Exception e) {
+			return "error";
+		}
+		return "success";
+	}
+	
+	@POST
+	@Path("/edit")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String editPerson(PersonDto personDto) {
+		try {
+			personService.editPerson(personDto);
+		} catch (Exception e) {
+			return "error";
+		}
 		return "success";
 	}
 	
 	@DELETE
 	@Path("/delete")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String removePerson(@FormParam("id") int id) {
+	public String removePerson(@QueryParam("id") int id) {
 		try {
 			personService.deletePerson(id);
 		} catch (Exception e) {

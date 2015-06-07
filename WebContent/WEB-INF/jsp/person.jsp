@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Hello Person</title>
+<title>Training Person</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet"
 	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -27,6 +27,9 @@
 					<td>
 						<button class="btn" ng-click="editPerson(person.id)">
 							<span class="glyphicon glyphicon-pencil"></span> Edit
+						</button>
+						<button class="btn" ng-click="removePerson(person.id)">
+							<span class="glyphicon glyphicon-remove"></span> Delete
 						</button>
 					</td>
 					<td>{{ person.name }}</td>
@@ -64,36 +67,47 @@
 	</div>
 	<script>
 	angular.module('trainJeeApp', []).controller('personController', function($scope, $http) {
-		$scope.edit = false;
-		$scope.fName = '';
-		$scope.fDate = '';
-		$scope.persons = [];
-		
-		$http.get("http://localhost:8080/train_jee/rest/person/get")
-		.success(function(response) {
-			for (var i = 0; i < response.records.length; i++) {
-				var record = response.records[i];
-				$scope.persons[i] = getPersonFrom(record);
-			}
-		});
+		refreshPage($scope);
+		loadPersonList($scope, $http);
 		
 		$scope.editPerson = function(id) {
+			var person = findPersonById($scope.persons, id);
 			$scope.edit = true;
-			//TODO find person properly
-			$scope.fName = $scope.persons[id - 1].name;
-			$scope.fDate = $scope.persons[id - 1].birthDate;
+			$scope.fName = person.name;
+			$scope.fDate = person.birthDate;
+			$scope.id = person.id;
 		};
 		
 		$scope.createPerson = function() {
 			$scope.edit = false;
 			$scope.fName = '';
 			$scope.fDate = '';
+			$scope.id = 0;
 		};
 		
 		$scope.submitForm = function() {
-			getPersonFromForm($scope);
-			$http.post("http://localhost:8080/train_jee/rest/person/add", getPersonFromForm($scope));
+			var sumbitActionUrl;
+			var personInfo = getPersonFromForm($scope);
+			if ($scope.edit) {
+				submitActionUrl = "http://localhost:8080/train_jee/rest/person/edit";
+			} else {
+				submitActionUrl = "http://localhost:8080/train_jee/rest/person/add";
+			}
+			$http.post(submitActionUrl, personInfo).success(function(response) {
+				refreshPage($scope);
+				loadPersonList($scope, $http);
+			});
 		};
+		
+		$scope.removePerson = function(id) {
+			// alert(JSON.stringify(id));
+			
+			$http.delete("http://localhost:8080/train_jee/rest/person/delete", {params: {id: id}})
+				.success(function(response) {
+					refreshPage($scope);
+					loadPersonList($scope, $http);
+				});
+		}
 	});
 	
 	var DATE_SEPARATOR = "/";
@@ -110,8 +124,9 @@
 	
 	function getPersonFromForm($scope) {
 		var person = {};
+		person.id = $scope.id;
 		person.name = $scope.fName;
-		person.birthDate = new Date($scope.fDate).getTime();
+		person.birthDate = Date.parse($scope.fDate);
 		return person;
 	}
 	
@@ -121,16 +136,42 @@
 		var yyyy = date.getFullYear();
 		
 		var dateAsString = "";
-		if (dd < 10) {
-			dateAsString += "0";
-		}
-		dateAsString += dd + DATE_SEPARATOR;
 		if (mm < 10) {
 			dateAsString += "0";
 		}
-		dateAsString += mm + DATE_SEPARATOR + yyyy;
-		
+		dateAsString += mm + DATE_SEPARATOR;
+		if (dd < 10) {
+			dateAsString += "0";
+		}
+		dateAsString += dd + DATE_SEPARATOR + yyyy;
 		return dateAsString;
+	}
+	
+	function refreshPage($scope) {
+		$scope.edit = false;
+		$scope.fName = '';
+		$scope.fDate = '';
+		$scope.id = 0;
+		$scope.persons = [];
+	}
+	
+	function loadPersonList($scope, $http) {
+		$http.get("http://localhost:8080/train_jee/rest/person/get")
+			.success(function(response) {
+				for (var i = 0; i < response.records.length; i++) {
+					var record = response.records[i];
+					$scope.persons[i] = getPersonFrom(record);
+				}
+			});
+	}
+	
+	function findPersonById(persons, id) {
+		for (var i = 0; i < persons.length; i++) {
+			if (persons[i].id == id) {
+				return persons[i];
+			}
+		}
+		return null;
 	}
 	</script>
 </body>

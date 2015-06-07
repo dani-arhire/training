@@ -4,18 +4,14 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
 	id="WebApp_ID" version="3.1">
 	<display-name>train_jee</display-name>
-	<!-- <welcome-file-list> <welcome-file>index.html</welcome-file> </welcome-file-list> -->
-
 	<servlet>
 		<servlet-name>person</servlet-name>
 		<jsp-file>/WEB-INF/jsp/person.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>javax.ws.rs.core.Application</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-
 	<servlet-mapping>
 		<servlet-name>person</servlet-name>
 		<url-pattern>/page/person</url-pattern>
