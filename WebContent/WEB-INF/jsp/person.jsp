@@ -13,7 +13,7 @@
 </head>
 <body ng-app="trainJeeApp" ng-controller="personController">
 	<div class="container">
-		<h3>Users</h3>
+		<h3>Persons</h3>
 		<table class="table table-striped">
 			<thead>
 				<tr>
@@ -108,6 +108,23 @@
 					loadPersonList($scope, $http);
 				});
 		}
+		
+		$scope.$watch("fName", function() {$scope.validate();});
+		$scope.$watch("fDate", function() {$scope.validate();});
+		
+		$scope.validate = function() {
+			var nameLength = $scope.fName.trim().length;
+			$scope.incomplete = nameLength < 5 || nameLength > 50;
+			$scope.error = isNaN(Date.parse($scope.fDate));
+			
+			if (!$scope.error) {
+				var fdate = new Date($scope.fDate);
+				var currentDate = new Date();
+				
+				$scope.error = fdate.getFullYear() < 1900
+					|| fdate.getFullYear() >= currentDate.getFullYear();
+			}
+		}
 	});
 	
 	var DATE_SEPARATOR = "/";
@@ -132,7 +149,7 @@
 	
 	function getDateToString(date) {
 		var dd = date.getDate();
-		var mm = date.getMonth();
+		var mm = date.getMonth() + 1;
 		var yyyy = date.getFullYear();
 		
 		var dateAsString = "";
