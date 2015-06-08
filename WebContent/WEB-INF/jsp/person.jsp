@@ -89,20 +89,24 @@
 			var sumbitActionUrl;
 			var personInfo = getPersonFromForm($scope);
 			if ($scope.edit) {
-				submitActionUrl = "http://localhost:8080/train_jee/rest/person/edit";
+				$http.put(PERSON_REST_URL, personInfo)
+					.success(function(response) {
+						refreshPage($scope);
+						loadPersonList($scope, $http);
+					});
 			} else {
-				submitActionUrl = "http://localhost:8080/train_jee/rest/person/add";
+				$http.post(PERSON_REST_URL, personInfo)
+					.success(function(response) {
+						refreshPage($scope);
+						loadPersonList($scope, $http);
+					});
 			}
-			$http.post(submitActionUrl, personInfo).success(function(response) {
-				refreshPage($scope);
-				loadPersonList($scope, $http);
-			});
 		};
 		
 		$scope.removePerson = function(id) {
 			// alert(JSON.stringify(id));
 			
-			$http.delete("http://localhost:8080/train_jee/rest/person/delete", {params: {id: id}})
+			$http.delete(PERSON_REST_URL, {params: {id: id}})
 				.success(function(response) {
 					refreshPage($scope);
 					loadPersonList($scope, $http);
@@ -128,6 +132,7 @@
 	});
 	
 	var DATE_SEPARATOR = "/";
+	var PERSON_REST_URL = "http://localhost:8080/train_jee/rest/person";
 	
 	function getPersonFrom(record) {
 		var person = {};
@@ -173,10 +178,10 @@
 	}
 	
 	function loadPersonList($scope, $http) {
-		$http.get("http://localhost:8080/train_jee/rest/person/get")
+		$http.get(PERSON_REST_URL)
 			.success(function(response) {
-				for (var i = 0; i < response.records.length; i++) {
-					var record = response.records[i];
+				for (var i = 0; i < response.length; i++) {
+					var record = response[i];
 					$scope.persons[i] = getPersonFrom(record);
 				}
 			});

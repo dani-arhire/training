@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 
 import danny.demo.train.dao.PersonDao;
 import danny.demo.train.dto.PersonDto;
@@ -14,11 +14,10 @@ import danny.demo.train.entity.Person;
 @Stateless
 public class PersonService {
 
-	@EJB
+	@Inject
 	private PersonDao personDao;
 
-
-	public List<PersonDto> getAllPersons() throws Exception {
+	public List<PersonDto> getAllPersons() {
 		List<Person> allPersonsList = personDao.getPersons();
 		List<PersonDto> result = new ArrayList<>();
 		for (Person p : allPersonsList) {
@@ -28,17 +27,17 @@ public class PersonService {
 		return result;
 	}
 
-	public void addPerson(PersonDto personDto) throws Exception {
+	public void addPerson(PersonDto personDto) {
 		Person p = generatePersonFromDto(personDto);
 		personDao.addPerson(p);
 	}
 	
-	public void editPerson(PersonDto personDto) throws Exception {
+	public void editPerson(PersonDto personDto) {
 		Person p = generatePersonFromDto(personDto);
 		personDao.updatePerson(p);
 	}
 	
-	public void deletePerson(int id) throws Exception {
+	public void deletePerson(int id) {
 		personDao.deletePerson(id);
 	}
 	
